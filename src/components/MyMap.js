@@ -25,7 +25,7 @@ export default function MyMap() {
                 />
                 {pos.map(s => {
                     return (
-                        <Marker position={s}>
+                        <Marker key={s} position={s}>
                             <Popup>
                                 {s}
                             </Popup>
