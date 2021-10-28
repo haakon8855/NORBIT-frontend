@@ -5,6 +5,7 @@ import SearchBar from "material-ui-search-bar";
 import * as L from "leaflet";
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import Axios from 'axios'
 
 export default function MyMap() {
 
@@ -40,12 +41,39 @@ export default function MyMap() {
     const [showFingerPrint, setShowFingerPrint] = useState(true)
     const [showLoactors, setShowLocators] = useState(true)
     const [showBeaconPos, setShowBeaconPos] = useState(false)
+    const [objects, setObjects] = useState()
 
 
     const onClickMulti = () => setShowMulti(showMulti => !showMulti)
     const onClickFingerPrint = () => setShowFingerPrint(showFingerPrint => !showFingerPrint)
     const onClickLocators = () => setShowLocators(showLoactors => !showLoactors)
     const onClickBeaconPos = () => setShowBeaconPos(showBeaconPos => !showBeaconPos)
+
+
+
+    useEffect(() => {
+        Axios.get('http://localhost:5000/lastPredictedLocations/')
+            .then(response => {
+                let list = []
+                let list1 = []
+                let list2 = []
+                for (let i = 0; i < response.data.length; i++) {
+                    list.push([response.data[i].fp_latitude, response.data[i].fp_longitude, response.data[i].deviceId])
+                }
+                for (let i = 0; i < response.data.length; i++) {
+                    list1.push([response.data[i].multilat_latitude, response.data[i].multilat_longitude, response.data[i].deviceId])
+                }
+                for (let i = 0; i < response.data.length; i++) {
+                    list2.push([response.data[i].true_latitude, response.data[i].true_longitude, response.data[i].deviceId])
+                }
+                setBeaconPosFingerPrinting(list)
+                setBeaconPosMulti(list1)
+                setBeaconPos(list2)
+                console.log(list)
+
+
+            })
+    }, [])
 
     return (
         <div>
@@ -68,7 +96,7 @@ export default function MyMap() {
                         return (
                             <Marker key={s} position={s} icon={blueIcon}>
                                 <Popup>
-                                    {s[0] + ' ' + s[1]}
+                                    {s[2]}
                                 </Popup>
                             </Marker>)
                     }) : null}
@@ -87,7 +115,7 @@ export default function MyMap() {
                         return (
                             <Marker key={s} position={s} icon={redIcon}>
                                 <Popup>
-                                    {s[0] + ' ' + s[1]}
+                                    {s[2]}
                                 </Popup>
                             </Marker>)
                     }) : null}
@@ -97,7 +125,7 @@ export default function MyMap() {
                         return (
                             <Marker key={s} position={s} icon={goldIcon}>
                                 <Popup>
-                                    {s[0] + ' ' + s[1]}
+                                    {s[2]}
                                 </Popup>
                             </Marker>)
                     }) : null}
